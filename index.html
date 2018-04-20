@@ -1,11 +1,125 @@
 <!DOCTYPE html>
 <html lang="zh-cmn-Hans">
-  <head>
+
+<head>
     <meta charset="utf-8">
-    <title>sim</title>
-  </head>
-  <body>
-    <div id="app"></div>
-	特殊的更新test for change
-  </body>
+    <title>myBlog</title>
+    <link rel="stylesheet" href="./css/app.css">
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class='leftNav'>
+        	<!-- LOGO -->
+            <div class='logo'>
+                <img class='author_image' src="https://qlogo3.store.qq.com/qzone/393389826/393389826/100?1517930091" alt="">
+                <a class='m_link author_name' href="#">
+					醉笑红颜舞
+				</a>
+            </div>
+            <!-- MENU -->
+            <ul>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe694;</i>
+						首页
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe7ec;</i>
+						分类
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe639;</i>
+						归档
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe63c;</i>
+						相册
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe738;</i>
+						音乐
+					</a>
+                </li>
+                <li>
+                    <a  href="#">
+                    	<i class='iconfont'>&#xe693;</i>
+						关于
+					</a>
+                </li>
+            </ul>
+            <!-- LINK -->
+            <div class='link'>
+            	<a href="#">
+					<i class='iconfont'>&#xe7ab;</i>GIitHub
+            	</a>
+            	<a href="#">
+					<i class='iconfont'>&#xe602;</i>E-Mail
+            	</a>
+            </div>
+            <hr>
+            <!-- Music -->
+            <div class='music-box'>
+				<div class='music'>
+					<div class='singerimg'>
+						<img src="http://singerimg.kugou.com/uploadpic/softhead/400/20180327/20180327183312661.jpg" width='160' alt="">
+					</div>
+					<p style='color:#ff4949'>冯提莫-佛系少女</p>
+					<p id='lrc'></p>
+					<div class='audiobox'>
+						<audio class='audio' src="http://fs.w.kugou.com/201804200936/1e260439a7057ddbab3eff4a0a3e8150/G123/M05/05/11/uw0DAFqBb8-ANLVwAC-Y34NVTZE339.mp3" autoplay loop controls="controls">
+					</div>
+				</div>
+            </div>
+        </div>
+        <div class='container'>
+        </div>
+        <div class='footer'>
+        </div>
+    </div>
+    <script>
+    	var lrc,lrcObj={};
+    	axios.get('./assets/lrc/foxishaonv.lrc').then(function(res){
+    		lrcs = decodeURIComponent(res.data).split('\n');
+    		for(var i=0;i<lrcs.length;i++){
+    			lrc = lrcs[i];
+    			var timeReg = /\[\d*:\d*((\.|\:)\d*)*\]/g;
+		        var timeRegExpArr = lrc.match(timeReg);
+		        if(!timeRegExpArr)continue;
+		        var clause = lrc.replace(timeReg,'');
+		        for(var k = 0,h = timeRegExpArr.length;k < h;k++) {
+		            var t = timeRegExpArr[k];
+		            var min = Number(String(t.match(/\[\d*/i)).slice(1)),
+		                sec = Number(String(t.match(/\:\d*/i)).slice(1));
+		            var time = min * 60 + sec;
+		            lrcObj[time] = clause;
+		        }
+    		}
+    	})
+    	var music = document.getElementsByTagName('audio')[0];
+    	var temp_lrc = '';
+    	var lrcTxt = document.getElementById('lrc');
+    	music.addEventListener('timeupdate',function(e){
+    		var time = Math.round(e.target.currentTime);
+    		var lrctxt = '';
+    		if(lrcObj[time] == undefined) {
+    			lrctxt = temp_lrc;
+    		}else{
+    			lrctxt = lrcObj[time];
+    			temp_lrc = lrcObj[time];
+    			lrcTxt.innerHTML = lrctxt;
+    		}
+    	})
+    </script>
+</body>
+
 </html>

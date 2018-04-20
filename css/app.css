@@ -1,0 +1,135 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+html,body{
+	width: 100%;
+}
+@font-face {
+  font-family: 'iconfont';  /* project id 636242 */
+  src: url('https://at.alicdn.com/t/font_636242_pym8q44p7rchxgvi.eot');
+  src: url('https://at.alicdn.com/t/font_636242_pym8q44p7rchxgvi.eot?#iefix') format('embedded-opentype'),
+  url('https://at.alicdn.com/t/font_636242_pym8q44p7rchxgvi.woff') format('woff'),
+  url('https://at.alicdn.com/t/font_636242_pym8q44p7rchxgvi.ttf') format('truetype'),
+  url('https://at.alicdn.com/t/font_636242_pym8q44p7rchxgvi.svg#iconfont') format('svg');
+}
+.iconfont{
+    font-family:"iconfont" !important;
+    font-size:16px;font-style:normal;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-stroke-width: 0.2px;
+    -moz-osx-font-smoothing: grayscale;
+}
+hr{
+	border-top:1px solid #eee;
+	border-left:0;
+	border-right:0;
+	border-bottom:0;
+	margin-top: 20px;
+}
+a{
+	color: #555;
+	text-decoration: none;
+	position: relative;
+	padding: 3px 5px;
+}
+a:hover{
+	color: #ff4949;
+}
+.m_link:hover{
+	color: #999;
+}
+.m_link::before{
+	position: absolute;
+	background-color: #999;
+	content: '';
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 2px;
+	transition: width .4s;
+}
+.m_link::after{
+	position: absolute;
+	background-color: #999;
+	content: '';
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 2px;
+	transition: width .4s,left .4s;
+}
+.m_link:hover:before{
+	width: 50%;
+}
+.m_link:hover:after{
+	left: 0;
+	width: 50%;
+}
+
+#app{
+	width: 100%;
+	font-family: 'Lato', "PingFang SC", "Microsoft YaHei", sans-serif;
+	color: #555;
+}
+.leftNav{
+	position: fixed;
+	height: 100%;
+	width: 260px;
+	background-color: #ddd;
+	text-align: center;
+}
+.logo{
+	padding: 50px;
+}
+.author_image{
+	border-radius: 50px;
+}
+.author_image:hover{
+	transition: transformImage 1s infinite linear;
+	-webkit-animation:transformImage 1s infinite linear;
+}
+@keyframes transformImage{
+	from{
+		transform: rotate(0deg);
+	}
+	to{
+		transform: rotate(360deg);
+	}
+}
+.author_name{
+	display: inline-block;
+}
+.leftNav li{
+	padding: 5px;
+}
+.link{
+	display: inline-block;
+	padding-top: 50px;
+}
+.link a:hover{
+	background-color: #eee;
+}
+.music-box{
+	padding-top: 20px;
+}
+.singerimg img{
+	width: 160px;
+	border-radius: 80px;
+	transition: transformImage 5s infinite linear;
+	-webkit-animation:transformImage 5s infinite linear;
+}
+.audiobox{
+	width: 150px;
+	overflow: hidden;
+	text-align: center;
+	margin: 0 auto;
+}
+.audiobox audio{
+	width: 180px;
+}
+#lrc{
+	height: 32px;
+	padding: 3px 0;
+	line-height: 32px;
+}

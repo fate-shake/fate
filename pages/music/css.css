@@ -1,0 +1,79 @@
+.m_box{
+	width: 100%;
+	max-width: 600px;
+}
+.m_player{
+	width: 100%;
+	border:1px solid #ddd;
+}
+.m_singerimg{
+	width: 160px;
+	height: 160px;
+	float: left;
+}
+.m_ctrls{
+	padding-left: 160px;
+	width: 410px;
+	height: 160px;
+}
+.m_singmsg{
+	color: #ff4949;
+	font-size: 20px;
+	padding: 5px 10px;
+}
+#m_slider{
+	width: 100%;
+	margin: 25px 0;
+}
+.ctrl_btn{
+	text-align: center;
+}
+.ctrl_btn a{
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+	margin: 0 12px;
+	border-radius: 18px;
+	line-height: 50px;
+	color: #ffffff;
+	background-color: #20a0ff;
+	transition: all .3s;
+}
+.ctrl_btn a:hover{
+	background-color: #31c27c;
+	border-radius: 30px;
+}
+.ctrl_btn .iconfont{
+	font-size: 32px;
+}
+.m_lrc{
+	height: 600px;
+	border:1px solid #ddd;
+	overflow: hidden;
+	text-align: center;
+	padding-top: 20px;
+}
+#m_lrc_p{
+	transform: translateY(306px);
+	transition: all .3s;
+}
+.m_lrc p{
+	padding: 5px;
+	line-height: 24px;
+	transition: all .3s;
+}
+input[type=range]{
+	-webkit-appearance: none;
+	background-color: #20a0ff;
+	height: 5px;
+	border-radius: 5px;
+	outline: none;
+
+}
+input[type=range]::-webkit-slider-thumb{
+	-webkit-appearance: none;
+	width: 10px;
+	height: 20px;
+	background-color: #31c27c;
+	border-radius: 15px;
+}

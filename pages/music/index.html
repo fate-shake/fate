@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+    <meta charset="utf-8">
+    <title>myBlog</title>
+    <link rel="stylesheet" href="./../../css/app.css">
+    <link rel="stylesheet" href="css.css">
+    <script src="https://cdn.bootcss.com/axios/0.18.0/axios.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class='leftNav'>
+            <!-- LOGO -->
+            <div class='logo'>
+                <img class='author_image' src="./../../assets/images/me.jpg" alt="">
+                <a class='m_link author_name' href="#">
+					醉笑红颜舞
+				</a>
+            </div>
+            <!-- MENU -->
+            <ul>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe694;</i>
+						首页
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe7ec;</i>
+						分类
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe639;</i>
+						归档
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe63c;</i>
+						相册
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe738;</i>
+						音乐
+					</a>
+                </li>
+                <li>
+                    <a href="#">
+                    	<i class='iconfont'>&#xe693;</i>
+						关于
+					</a>
+                </li>
+                <div style='clear:both;'>
+                </div>
+            </ul>
+            <!-- LINK -->
+            <div class='link'>
+                <a href="#">
+					<i class='iconfont'>&#xe7ab;</i>GIitHub
+            	</a>
+                <a href="#">
+					<i class='iconfont'>&#xe602;</i>E-Mail
+            	</a>
+            </div>
+            <hr>
+            <!-- Music -->
+            <div class='music-box'>
+                <div class='music'>
+                    <div class='singerimg'>
+                        <img src="http://singerimg.kugou.com/uploadpic/softhead/400/20180327/20180327183312661.jpg" width='160' alt="">
+                    </div>
+                    <p style='color:#ff4949'>冯提莫-佛系少女</p>
+                    <p id='lrc'></p>
+                    <div class='audiobox'>
+                        <audio class='audio' src="./../../assets/music/foxishaonv.mp3" loop controls="controls">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class='container'>
+            <div class='music-container'>
+                <div class='m_box'>
+                    <div class='m_player'>
+                        <div class='m_singerimg'>
+                            <img src="http://singerimg.kugou.com/uploadpic/softhead/400/20180327/20180327183312661.jpg" width='160' alt="">
+                        </div>
+                        <div class='m_ctrls'>
+                            <p class='m_singmsg'>冯提莫-佛系少女</p>
+                            <div class='ctrls'>
+                                <input id='m_slider' type="range">
+                                <div class='ctrl_btn'>
+                                    <a href="#"><i class='iconfont'>&#xe65d;</i></a>
+                                    <a href="#"><i class='iconfont'>&#xe8bf;</i></a>
+                                    <a href="#"><i class='iconfont'>&#xe65b;</i></a>
+                                    <a href="#"><i class='iconfont'>&#xe62d;</i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <audio id='m_audio' src="./../../assets/music/foxishaonv.mp3" autoplay loop></audio>
+                    </div>
+                    <div class='m_lrc'>
+                        <div id='m_lrc_p'>
+                        </div>
+                    </div>
+                </div>
+                <div class='m_list'>
+                </div>
+            </div>
+        </div>
+        <div class='footer'>
+        </div>
+    </div>
+    <script>
+    var lrc, lrcObj = {},
+        lrcArr = [];
+    axios.get('./../../assets/lrc/foxishaonv.lrc').then(function(res) {
+        lrcs = decodeURIComponent(res.data).split('\n');
+        var lrcTxt = '';
+        for (var i = 0; i < lrcs.length; i++) {
+            lrc = lrcs[i];
+            var timeReg = /\[\d*:\d*((\.|\:)\d*)*\]/g;
+            var timeRegExpArr = lrc.match(timeReg);
+            if (!timeRegExpArr) continue;
+            var clause = lrc.replace(timeReg, '');
+            for (var k = 0, h = timeRegExpArr.length; k < h; k++) {
+                var t = timeRegExpArr[k];
+                var min = Number(String(t.match(/\[\d*/i)).slice(1)),
+                    sec = Number(String(t.match(/\:\d*/i)).slice(1));
+                var time = min * 60 + sec;
+                if(lrcObj[time]){
+                	lrcObj[time] += '\n'+clause;
+                	lrcArr[lrcArr.length -1] = lrcObj[time];
+                }else{
+                	lrcObj[time] = clause;
+                	lrcArr.push(clause);
+                }
+                lrcTxt += '<p>' + clause + '</p>'
+            }
+        }
+        m_lrc_p.innerHTML = lrcTxt;
+    })
+    var music = document.getElementsByTagName('audio')[0];
+    var temp_lrc = '';
+    var lrcTxt = document.getElementById('lrc');
+    music.addEventListener('timeupdate', function(e) {
+        var time = Math.round(e.target.currentTime);
+        var lrctxt = '';
+        if (lrcObj[time] == undefined) {
+            lrctxt = temp_lrc;
+        } else {
+            lrctxt = lrcObj[time];
+            temp_lrc = lrcObj[time];
+            lrcTxt.innerHTML = lrctxt;
+        }
+    })
+    // m_box
+    var m_box = document.getElementById('m_audio');
+    var m_lrc_temp = '';
+    var m_lrc_p = document.getElementById('m_lrc_p');
+
+    function sortFn(a, b) {
+        return a - b;
+    }
+    m_box.addEventListener('timeupdate', function(e) {
+        var time = Math.round(e.target.currentTime);
+        var offset = 306;
+        if (lrcObj[time] != undefined && lrcObj[time] != '') {
+        	if(m_lrc_temp == lrcObj[time]){
+        		return;
+        	}
+        	m_lrc_temp = lrcObj[time];
+        	var index = lrcArr.indexOf(lrcObj[time]);
+            offset += -index * 34;
+            m_lrc_p.style.transform = 'translateY(' + offset + 'px)';
+            for(var i=0;i<m_lrc_p.children.length;i++){
+            	m_lrc_p.children[i].style.color = '#555';
+            	m_lrc_p.children[i].style.fontSize = '12px';
+            	m_lrc_p.children[i].style.background = '#fff';
+            }
+            m_lrc_p.children[index].style.color = 'red';
+            m_lrc_p.children[index].style.fontSize = '18px';
+            m_lrc_p.children[index].style.background = '#20a0ff63';
+        }
+
+
+    })
+    </script>
+</body>
+
+</html>

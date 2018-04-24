@@ -94,16 +94,17 @@
                         <div class='m_ctrls'>
                             <p class='m_singmsg'>冯提莫-佛系少女</p>
                             <div class='ctrls'>
+                                <p style='text-align: right;'><span id='p_time'></span>/<span id='t_time'></span></p>
                                 <input id='m_slider' type="range">
                                 <div class='ctrl_btn'>
-                                    <a href="#"><i class='iconfont'>&#xe65d;</i></a>
-                                    <a href="#"><i class='iconfont'>&#xe8bf;</i></a>
-                                    <a href="#"><i class='iconfont'>&#xe65b;</i></a>
-                                    <a href="#"><i class='iconfont'>&#xe62d;</i></a>
+                                    <a id='sp' href="#"><i class='iconfont'>&#xe65d;</i></a>
+                                    <a id='prev' href="#"><i class='iconfont'>&#xe8bf;</i></a>
+                                    <a id='next' href="#"><i class='iconfont'>&#xe65b;</i></a>
+                                    <a id='loop' href="#"><i class='iconfont'>&#xe62d;</i></a>
                                 </div>
                             </div>
                         </div>
-                        <audio id='m_audio' src="./../../assets/music/foxishaonv.mp3" autoplay loop></audio>
+                        <audio id='m_audio' src="./../../assets/music/foxishaonv.mp3" autoplay></audio>
                     </div>
                     <div class='m_lrc'>
                         <div id='m_lrc_p'>
@@ -123,27 +124,44 @@
     axios.get('./../../assets/lrc/foxishaonv.lrc').then(function(res) {
         lrcs = decodeURIComponent(res.data).split('\n');
         var lrcTxt = '';
+        var txtArr = [];
+        var prev = 0;
         for (var i = 0; i < lrcs.length; i++) {
             lrc = lrcs[i];
             var timeReg = /\[\d*:\d*((\.|\:)\d*)*\]/g;
             var timeRegExpArr = lrc.match(timeReg);
             if (!timeRegExpArr) continue;
+            lrc.replace(/\"/g, "'");
             var clause = lrc.replace(timeReg, '');
             for (var k = 0, h = timeRegExpArr.length; k < h; k++) {
                 var t = timeRegExpArr[k];
                 var min = Number(String(t.match(/\[\d*/i)).slice(1)),
-                    sec = Number(String(t.match(/\:\d*/i)).slice(1));
+                    sec = Number(String(t.match(/\:\d*/i)).slice(1)),
+                    ms = Number(t.split(':')[1].split(']')[0].split('.')[1]) / 100;
                 var time = min * 60 + sec;
-                if(lrcObj[time]){
-                	lrcObj[time] += '\n'+clause;
-                	lrcArr[lrcArr.length -1] = lrcObj[time];
-                }else{
-                	lrcObj[time] = clause;
-                	lrcArr.push(clause);
+                // if (clause.length == 1) {
+                //     console.log(clause);
+                //     time += 0.5;
+                // }
+                if (time < prev) {
+                    time = prev + 1;
                 }
-                lrcTxt += '<p>' + clause + '</p>'
+                prev = time;
+                if (lrcObj[time]) {
+                    lrcObj[time] += '\n' + clause;
+                    lrcArr[lrcArr.length - 1] = time;
+                    txtArr[txtArr.length - 1] = '<p>' + lrcObj[time] + '</p>';
+                } else {
+                    lrcObj[time] = clause;
+                    lrcArr.push(time);
+                    txtArr.push('<p>' + lrcObj[time] + '</p>');
+                }
+
             }
         }
+        txtArr.map(function(item, index, input) {
+            lrcTxt += item;
+        })
         m_lrc_p.innerHTML = lrcTxt;
     })
     var music = document.getElementsByTagName('audio')[0];
@@ -168,29 +186,78 @@
     function sortFn(a, b) {
         return a - b;
     }
+    var slider = document.getElementById('m_slider');
+    var t_time = document.getElementById('t_time');
+    var p_time = document.getElementById('p_time');
+    p_time.innerHTML = '00:00';
     m_box.addEventListener('timeupdate', function(e) {
-        var time = Math.round(e.target.currentTime);
+        var time = Math.ceil(e.target.currentTime) - 1;
+        slider.value = time;
+
+        p_time.innerHTML = parseInt(time / 60) + ':' + timeComplete(time % 60);
+
         var offset = 306;
-        if (lrcObj[time] != undefined && lrcObj[time] != '') {
-        	if(m_lrc_temp == lrcObj[time]){
-        		return;
-        	}
-        	m_lrc_temp = lrcObj[time];
-        	var index = lrcArr.indexOf(lrcObj[time]);
-            offset += -index * 34;
-            m_lrc_p.style.transform = 'translateY(' + offset + 'px)';
-            for(var i=0;i<m_lrc_p.children.length;i++){
-            	m_lrc_p.children[i].style.color = '#555';
-            	m_lrc_p.children[i].style.fontSize = '12px';
-            	m_lrc_p.children[i].style.background = '#fff';
-            }
-            m_lrc_p.children[index].style.color = 'red';
-            m_lrc_p.children[index].style.fontSize = '18px';
-            m_lrc_p.children[index].style.background = '#20a0ff63';
+
+        if (!lrcObj[time]) {
+            return;
         }
-
-
+        if (m_lrc_temp == lrcObj[time]) {
+            // console.log(m_lrc_temp + '\n' + lrcObj[time]);
+            return;
+        }
+        m_lrc_temp = lrcObj[time];
+        var index = lrcArr.indexOf(time);
+        if (index < 0) {
+            console.log(index);
+            return;
+        }
+        offset += -(index) * 34;
+        m_lrc_p.style.transform = 'translateY(' + offset + 'px)';
+        for (var i = 0; i < m_lrc_p.children.length; i++) {
+            m_lrc_p.children[i].style.color = '#ffffff';
+        }
+        m_lrc_p.children[index].style.color = '#F7BA2A';
     })
+    m_box.addEventListener('ended', function() {
+        sp.innerHTML = "<i class='iconfont'>&#xe65d;</i>";
+        p_time.innerHTML = '00:00';
+        slider.value = 0;
+    })
+    var timer = setTimeout(function() {
+        if (m_box.readyState == 4) {
+            clearTimeout(timer);
+            slider.min = 0;
+            slider.max = parseInt(m_box.duration);
+            var total = parseInt(slider.max / 60) + ':' + timeComplete(slider.max % 60);
+            t_time.innerHTML = total;
+            sp.innerHTML = "<i class='iconfont'>&#xe6c8;</i>";
+        }
+    }, 100)
+
+
+    var sp = document.getElementById('sp'),
+        prev = document.getElementById('prev'),
+        next = document.getElementById('next'),
+        loop = document.getElementById('loop');
+
+    sp.addEventListener('click', function(e) {
+        // 当前为暂停状态
+        if (m_box.paused || m_box.ended) {
+            m_box.play();
+            sp.innerHTML = "<i class='iconfont'>&#xe6c8;</i>";
+        } else {
+            m_box.pause();
+            sp.innerHTML = "<i class='iconfont'>&#xe65d;</i>";
+        }
+    })
+
+    function timeComplete(time) {
+        if (time < 10) {
+            return '0' + time;
+        } else {
+            return time;
+        }
+    }
     </script>
 </body>
 
